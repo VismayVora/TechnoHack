@@ -36,7 +36,6 @@ phonenumbers==8.12.36
 Pillow==8.4.0
 platformdirs==2.4.0
 protobuf==3.19.1
-psycopg2==2.7.7
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycryptodome==3.11.0
