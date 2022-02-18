@@ -29,6 +29,8 @@ class MyUser(AbstractBaseUser,PermissionsMixin):
 	phone_no = PhoneNumberField(unique = True)
 	address = models.TextField(max_length =100, blank = True)
 	is_staff = models.BooleanField(default = False)
+	points = models.IntegerField(default = 0)
+	stars = models.IntegerField(default = 0)
 	
 	USERNAME_FIELD = 'phone_no'
 	REQUIRED_FIELDS = ['first_name',]
@@ -38,9 +40,58 @@ class MyUser(AbstractBaseUser,PermissionsMixin):
 	def __str__(self):
 		return self.first_name
 
+	def star(self):
+		if self.points >= 1000 & self.points<2000 :
+			self.stars = 1
+		elif self.points >= 2000 & self.points<3000 :
+			self.stars = 2
+		elif self.points >= 3000 & self.points<4000 :
+			self.stars = 3
+		elif self.points >= 4000 & self.points<5000 :
+			self.stars = 4
+		elif self.points >= 5000:
+			self.stars = 5
+		else:
+			pass
+		return self.stars
+
 class Guardian(models.Model):
 	owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='MyUser', on_delete=models.CASCADE)
 	name = models.CharField(max_length=100)
 	relation = models.CharField(max_length=100)
 	phone_no = PhoneNumberField(unique = True)
 
+class Location(models.Model):
+	title = models.CharField(max_length=255,blank = True)
+	latitude = models.FloatField()
+	longitude = models.FloatField()
+	safety_score = models.FloatField(default = 0)
+
+	def __str__(self):
+		return f'{self.latitude,self.longitude}'
+
+	def get_score(self):
+		reviews = AuditForm.objects.filter(location = self)
+		count = 1
+		for review in reviews:
+			self.safety_score += review.score
+			count += 1
+		self.safety_score /= count
+		return self.safety_score
+
+class AuditForm(models.Model):
+	author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='author', on_delete=models.CASCADE)
+	location = models.ForeignKey(Location,on_delete=models.CASCADE)
+	lighting = models.PositiveIntegerField()
+	openness = models.PositiveIntegerField()
+	visibility = models.PositiveIntegerField()
+	people = models.PositiveIntegerField()
+	security = models.PositiveIntegerField()
+	walk_path = models.PositiveIntegerField()
+	public_transport = models.PositiveIntegerField()
+	public_usage = models.PositiveIntegerField()
+	feeling = models.PositiveIntegerField()
+	score = models.PositiveIntegerField()
+
+	def __str__(self):
+		return f'{self.location} - {self.score}'

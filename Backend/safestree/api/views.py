@@ -1,8 +1,8 @@
 import datetime
 from django.contrib.auth import authenticate,login
 
-from .models import MyUser,Guardian
-from .serializers import RegisterSerializer, LoginSerializer, GuardianSerializer
+from .models import MyUser,Guardian, Location, AuditForm
+from .serializers import LocationSerializer, RegisterSerializer, LoginSerializer, GuardianSerializer, AuditFormSerializer
 from rest_framework import viewsets,permissions
 from rest_framework.decorators import api_view
 from rest_framework.generics import GenericAPIView
@@ -70,3 +70,43 @@ def news(self):
     'apiKey=c476157b8a084a4b8bdf8a1a8dd2a7a7')
     response = requests.get(url)
     return Response(response)
+
+class LocationAPI(GenericAPIView):
+	serializer_class = LocationSerializer
+	permission_classes = [permissions.IsAuthenticated]
+	queryset = Location.objects.all()
+
+	def post(self,request):
+		serializer = self.serializer_class(data=request.data)
+		if serializer.is_valid(raise_exception=True):
+			serializer.save()
+		return Response(serializer.data)
+
+class AuditFormAPI(GenericAPIView):
+	serializer_class = AuditFormSerializer
+	permission_classes = [permissions.IsAuthenticated]
+	queryset = AuditForm.objects.all()
+
+	def post(self,request):
+		score = 0
+		score += request.data['lighting']
+		score += request.data['openness']
+		score += request.data['visibility']
+		score += request.data['people']
+		score += request.data['security']
+		score += request.data['walk_path']
+		score += request.data['public_transport']
+		score += request.data['public_usage']
+		score += request.data['feeling']
+		score /= 9
+		serializer = self.serializer_class(data=request.data)
+		if serializer.is_valid(raise_exception=True):
+			serializer.save(author=request.user,score = score)
+			loc_id = request.data['location']
+			location = Location.objects.get(id = loc_id)
+			location.get_score()
+			location.save()
+			request.user.points += 50
+			request.user.star()
+			request.user.save()
+		return Response(serializer.data)
