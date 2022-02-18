@@ -19,6 +19,15 @@ def send_text(number,msg):
         from_ ='+12346574691')
     return('success')
 
+def call_me(number):
+	client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN )
+	call = client.calls.create(
+                        twiml='<Response><Say>Ahoy, World!</Say></Response>',
+                        to=str(number),
+                        from_='+12346574691'
+                    )
+	return('success')
+
 class RegisterAPI(GenericAPIView):
 	
 	serializer_class = RegisterSerializer
@@ -136,4 +145,11 @@ def sharelocation(self):
 	msg = 'location : '
 	for guardian in guardians:
 		k = send_text(guardian.phone_no,msg)
+	return Response({'success':'success'})
+
+@api_view(('POST',))
+@permission_classes([permissions.IsAuthenticated])
+def fakecall(self):
+	user = self.user
+	call = call_me(user.phone_no)
 	return Response({'success':'success'})
