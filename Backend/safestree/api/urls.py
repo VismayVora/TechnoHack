@@ -11,5 +11,7 @@ urlpatterns = [
     path('register/', views.RegisterAPI.as_view(), name="register"),
     path('login/', views.LoginAPI.as_view(), name="login"),
     path('logout',views.logout,name="logout"),
-    path('news',views.news,name="news")
+    path('news',views.news,name="news"),
+    path('location',views.LocationAPI.as_view(),name="location"),
+    path('audit-form',views.AuditFormAPI.as_view(),name="audit-form")
 ]
