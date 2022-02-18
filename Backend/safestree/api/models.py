@@ -17,16 +17,18 @@ class MyUserManager(BaseUserManager):
 		
 	def create_superuser(self,phone_no,password=None,**extra_fields):
 		extra_fields.setdefault('is_superuser',True)
+		extra_fields.setdefault('is_staff',True)
 		user = self.create_user(phone_no,password,**extra_fields)
 		user.save()
 		return user
 
 class MyUser(AbstractBaseUser,PermissionsMixin):
-	email = models.EmailField(_('email address'), unique = True)
+	email = models.EmailField(_('email address'),unique = True)
 	first_name = models.CharField(max_length = 20)
 	last_name = models.CharField(max_length = 20)
 	phone_no = PhoneNumberField(unique = True)
 	address = models.TextField(max_length =100, blank = True)
+	is_staff = models.BooleanField(default = False)
 	
 	USERNAME_FIELD = 'phone_no'
 	REQUIRED_FIELDS = ['first_name',]
