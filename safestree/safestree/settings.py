@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'drf_yasg',
 
+    'django_twilio',
     'api',
 ]
 
@@ -85,10 +86,13 @@ WSGI_APPLICATION = 'safestree.wsgi.application'
 
 AUTH_USER_MODEL = 'api.MyUser'
 
+TWILIO_ACCOUNT_SID = env('TWILIO_SID')
+TWILIO_AUTH_TOKEN = env('TWILIO_AUTH_TOKEN')
+
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
+DATABASES = { 
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
