@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
@@ -34,3 +35,10 @@ class MyUser(AbstractBaseUser,PermissionsMixin):
 	
 	def __str__(self):
 		return self.first_name
+
+class Guardian(models.Model):
+	owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='MyUser', on_delete=models.CASCADE)
+	name = models.CharField(max_length=100)
+	relation = models.CharField(max_length=100)
+	phone_no = PhoneNumberField(unique = True)
+

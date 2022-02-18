@@ -1,7 +1,8 @@
 from django.contrib.auth import authenticate,login
 
-from .models import MyUser
-from .serializers import RegisterSerializer, LoginSerializer
+from .models import MyUser,Guardian
+from .serializers import RegisterSerializer, LoginSerializer, GuardianSerializer
+from rest_framework import viewsets,permissions
 from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView
 from rest_framework import status
@@ -40,3 +41,18 @@ def logout(self, request):
     logout(request)
     data = {'success': 'Sucessfully logged out'}
     return Response(data=data, status=status.HTTP_200_OK)
+
+class GuardianDetails(viewsets.ModelViewSet):
+	queryset = Guardian.objects.all()
+	serializer_class = GuardianSerializer
+	permission_classes = [permissions.IsAuthenticated]
+
+	def get_queryset(self):
+		return Guardian.objects.filter(owner=self.request.user)
+	
+	def perform_create(self,serializer):
+		serializer.save(owner = self.request.user)
+	
+	def update(self, request, *args, **kwargs):
+		kwargs['partial'] = True
+		return super().update(request, *args, **kwargs)
