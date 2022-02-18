@@ -38,6 +38,7 @@ class MyUser(AbstractBaseUser,PermissionsMixin):
 
 class Guardian(models.Model):
 	owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='MyUser', on_delete=models.CASCADE)
+	favourite = models.BooleanField()
 	name = models.CharField(max_length=100)
 	relation = models.CharField(max_length=100)
 	phone_no = PhoneNumberField(unique = True)
