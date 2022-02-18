@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MyUser
+from .models import Guardian, MyUser
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -31,6 +31,12 @@ class LoginSerializer(serializers.ModelSerializer):
 			raise serializers.ValidationError('Phone number is compulsory')
 		return attrs
 
+class GuardianSerializer(serializers.ModelSerializer):
+	owner = serializers.ReadOnlyField(source='owner.name')
+
+	class Meta:
+		model = Guardian
+		fields = '__all__'
     
 
 		
