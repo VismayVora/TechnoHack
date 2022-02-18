@@ -4,21 +4,14 @@ from django.contrib.auth import authenticate,login
 from .models import MyUser,Guardian, Location, AuditForm
 from .serializers import LocationSerializer, RegisterSerializer, LoginSerializer, GuardianSerializer, AuditFormSerializer
 from rest_framework import viewsets,permissions
-<<<<<<< HEAD
 from rest_framework.decorators import action,api_view
-=======
-from rest_framework.decorators import api_view
->>>>>>> 300856436df9f1c5822d7cb826b37f29466edf00
 from rest_framework.generics import GenericAPIView
 from rest_framework import status
 from rest_framework.response import Response
 
-<<<<<<< HEAD
 from .whatsapp import send_message
 from django.http import JsonResponse
-=======
 import requests
->>>>>>> 300856436df9f1c5822d7cb826b37f29466edf00
 
 class RegisterAPI(GenericAPIView):
 	
