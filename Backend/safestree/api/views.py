@@ -12,9 +12,9 @@ from rest_framework.response import Response
 from twilio.rest import Client
 import requests
 
-def send_text(number):
+def send_text(number,msg):
     client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN )
-    message = client.messages.create(body= f'Your ward has triggered Alert !',
+    message = client.messages.create(body= f'{msg}',
         to =str(number),
         from_ ='+12346574691')
     return('success')
@@ -124,6 +124,16 @@ class AuditFormAPI(GenericAPIView):
 @permission_classes([permissions.IsAuthenticated])
 def alert(self):
 	guardians = Guardian.objects.filter(owner=self.user)
+	msg = 'Your ward has triggered Alert !'
 	for guardian in guardians:
-		k = send_text(guardian.phone_no)
+		k = send_text(guardian.phone_no,msg)
+	return Response({'success':'success'})
+
+@api_view(('POST',))
+@permission_classes([permissions.IsAuthenticated])
+def sharelocation(self):
+	guardians = Guardian.objects.filter(owner=self.user, favourite = True)
+	msg = 'location : '
+	for guardian in guardians:
+		k = send_text(guardian.phone_no,msg)
 	return Response({'success':'success'})
