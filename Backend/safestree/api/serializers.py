@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Guardian, MyUser
+from .models import Guardian, MyUser, Location, AuditForm
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -36,6 +36,19 @@ class GuardianSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = Guardian
+		fields = '__all__'
+
+class LocationSerializer(serializers.ModelSerializer):
+
+	class Meta:
+		model = Location
+		fields = '__all__'
+
+class AuditFormSerializer(serializers.ModelSerializer):
+	author = serializers.ReadOnlyField(source='author.name')
+
+	class Meta:
+		model = AuditForm
 		fields = '__all__'
     
 

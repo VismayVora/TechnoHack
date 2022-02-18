@@ -1,15 +1,24 @@
+import datetime
 from django.contrib.auth import authenticate,login
 
-from .models import MyUser,Guardian
-from .serializers import RegisterSerializer, LoginSerializer, GuardianSerializer
+from .models import MyUser,Guardian, Location, AuditForm
+from .serializers import LocationSerializer, RegisterSerializer, LoginSerializer, GuardianSerializer, AuditFormSerializer
 from rest_framework import viewsets,permissions
+<<<<<<< HEAD
 from rest_framework.decorators import action,api_view
+=======
+from rest_framework.decorators import api_view
+>>>>>>> 300856436df9f1c5822d7cb826b37f29466edf00
 from rest_framework.generics import GenericAPIView
 from rest_framework import status
 from rest_framework.response import Response
 
+<<<<<<< HEAD
 from .whatsapp import send_message
 from django.http import JsonResponse
+=======
+import requests
+>>>>>>> 300856436df9f1c5822d7cb826b37f29466edf00
 
 class RegisterAPI(GenericAPIView):
 	
@@ -39,7 +48,7 @@ class LoginAPI(GenericAPIView):
 			return Response({'first_name' : user.first_name},status = status.HTTP_200_OK)
 		return Response('Invalid Credentials',status = status.HTTP_404_NOT_FOUND)
         
-@action(methods=['POST', ], detail=False)
+@api_view(('POST',))
 def logout(self, request):
     logout(request)
     data = {'success': 'Sucessfully logged out'}
@@ -84,3 +93,53 @@ def sos_alert(self,request):
 		
 	return JsonResponse({"Message": "The message has been sent to the favourite guardians!"})
 
+@api_view(('POST',))
+def news(self):
+    url = ('https://newsapi.org/v2/everything?'
+    'q=women+safety&'
+    'searchln=description'
+    f'from={datetime.date.today()}&'
+    'sortBy=popularity&'
+    'apiKey=c476157b8a084a4b8bdf8a1a8dd2a7a7')
+    response = requests.get(url)
+    return Response(response)
+
+class LocationAPI(GenericAPIView):
+	serializer_class = LocationSerializer
+	permission_classes = [permissions.IsAuthenticated]
+	queryset = Location.objects.all()
+
+	def post(self,request):
+		serializer = self.serializer_class(data=request.data)
+		if serializer.is_valid(raise_exception=True):
+			serializer.save()
+		return Response(serializer.data)
+
+class AuditFormAPI(GenericAPIView):
+	serializer_class = AuditFormSerializer
+	permission_classes = [permissions.IsAuthenticated]
+	queryset = AuditForm.objects.all()
+
+	def post(self,request):
+		score = 0
+		score += request.data['lighting']
+		score += request.data['openness']
+		score += request.data['visibility']
+		score += request.data['people']
+		score += request.data['security']
+		score += request.data['walk_path']
+		score += request.data['public_transport']
+		score += request.data['public_usage']
+		score += request.data['feeling']
+		score /= 9
+		serializer = self.serializer_class(data=request.data)
+		if serializer.is_valid(raise_exception=True):
+			serializer.save(author=request.user,score = score)
+			loc_id = request.data['location']
+			location = Location.objects.get(id = loc_id)
+			location.get_score()
+			location.save()
+			request.user.points += 50
+			request.user.star()
+			request.user.save()
+		return Response(serializer.data)
