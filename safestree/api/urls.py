@@ -5,7 +5,7 @@ from django.conf.urls import include,url
 
 router = DefaultRouter()
 router.register(r'guardians', views.GuardianDetails)
-router.register((r'checkins', views.CheckInAPI))
+router.register(r'checkins', views.CheckInAPI)
 
 urlpatterns = [
     url('', include(router.urls)),
