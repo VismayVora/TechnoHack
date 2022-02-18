@@ -1,11 +1,14 @@
+import datetime
 from django.contrib.auth import authenticate,login
 
 from .models import MyUser
 from .serializers import RegisterSerializer, LoginSerializer
-from rest_framework.decorators import action
+from rest_framework.decorators import api_view, pe
 from rest_framework.generics import GenericAPIView
 from rest_framework import status
 from rest_framework.response import Response
+
+import requests
 
 class RegisterAPI(GenericAPIView):
 	
@@ -35,8 +38,19 @@ class LoginAPI(GenericAPIView):
 			return Response({'first_name' : user.first_name},status = status.HTTP_200_OK)
 		return Response('Invalid Credentials',status = status.HTTP_404_NOT_FOUND)
         
-@action(methods=['POST', ], detail=False)
+@api_view(('POST',))
 def logout(self, request):
     logout(request)
     data = {'success': 'Sucessfully logged out'}
     return Response(data=data, status=status.HTTP_200_OK)
+
+@api_view(('POST',))
+def news(self):
+    url = ('https://newsapi.org/v2/everything?'
+    'q=women+safety&'
+    'searchln=description'
+    f'from={datetime.date.today()}&'
+    'sortBy=popularity&'
+    'apiKey=c476157b8a084a4b8bdf8a1a8dd2a7a7')
+    response = requests.get(url)
+    return Response(response)
