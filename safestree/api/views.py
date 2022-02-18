@@ -1,9 +1,9 @@
 import datetime
 from django.contrib.auth import authenticate,login
 from django.conf import settings
-from .models import MyUser,Guardian, Location, AuditForm
+from .models import CheckIn, MyUser,Guardian, Location, AuditForm
 
-from .serializers import LocationSerializer, RegisterSerializer, LoginSerializer, GuardianSerializer, AuditFormSerializer
+from .serializers import LocationSerializer, RegisterSerializer, LoginSerializer, GuardianSerializer, AuditFormSerializer, CheckInSerializer
 from rest_framework import viewsets,permissions
 from rest_framework.decorators import action,api_view, permission_classes
 from rest_framework.generics import GenericAPIView
@@ -82,32 +82,7 @@ class GuardianDetails(viewsets.ModelViewSet):
 		kwargs['partial'] = True
 		return super().update(request, *args, **kwargs)
 
-@api_view(['POST'])
-def sharelocation(self,request):
-	location_link = request.data['link']
-	favourites_list = []
-	favourites = Guardian.objects.filter(owner=self.request.user)
-	favourites_list.append(favourites)
-	for favourite in favourites_list:
-		message = f"Hello {favourite.name}, {favourite.owner} has started location sharing with you. Click on this link to track the location: {location_link}"
-		send_message(request,favourite,message)
-		
-	return JsonResponse({"Message": "The message has been sent to the favourite guardians!"})
-
-@api_view(['POST'])
-def sos_alert(self,request):
-	location_link = request.data['link']
-	guardians_list = []
-	guardians = Guardian.objects.filter(owner=self.request.user)
-	guardians_list.append(guardians)
-	for guardian in guardians_list:
-		message = f"Hello {guardian.name}, {guardian.owner} is in trouble and has raised an SOS!!. Click on this link to track the location: {location_link}"
-		send_message(request,guardian,message)
-		
-	return JsonResponse({"Message": "The message has been sent to the favourite guardians!"})
-
 @api_view(('POST',))
-@permission_classes([permissions.IsAuthenticated])
 def news(self):
     url = ('https://newsapi.org/v2/everything?'
     'q=women+safety&'
@@ -160,25 +135,44 @@ class AuditFormAPI(GenericAPIView):
 
 @api_view(('POST',))
 @permission_classes([permissions.IsAuthenticated])
-def alert(self):
-	guardians = Guardian.objects.filter(owner=self.user)
-	msg = 'Your ward has triggered Alert !'
-	for guardian in guardians:
-		k = send_text(guardian.phone_no,msg)
-	return Response({'success':'success'})
+def sharelocation(self):
+	location_link = self.data['link']
+	favourites = Guardian.objects.filter(owner=self.user, favourite = True)
+	for favourite in favourites:
+		msg = f"Hello {favourite.name}, {favourite.owner} has started location sharing with you. Click on this link to track the location: {location_link}"
+		send_message(self,favourite,msg)
+		k = send_text(favourite.phone_no,msg)
+	return Response({'success':"The message has been sent to the favourite guardians!"})
 
 @api_view(('POST',))
 @permission_classes([permissions.IsAuthenticated])
-def sharelocation(self):
-	guardians = Guardian.objects.filter(owner=self.user, favourite = True)
-	msg = 'location : '
+def sos_alert(self):
+	location_link = self.data['link']
+	guardians = Guardian.objects.filter(owner=self.user)
 	for guardian in guardians:
+		msg = f"Hello {guardian.name}, {guardian.owner} is in trouble and has raised an SOS!!. Click on this link to track the location: {location_link}"
+		send_message(self,guardian,msg)
 		k = send_text(guardian.phone_no,msg)
-	return Response({'success':'success'})
+	return Response({'success':"The message has been sent to guardians!"})
 
 @api_view(('POST',))
 @permission_classes([permissions.IsAuthenticated])
 def fakecall(self):
 	user = self.user
 	call = call_me(user.phone_no)
-	return Response({'success':'success'})
+	return Response({'success':"Fake call has been generated!"})
+
+class CheckInAPI(viewsets.ModelViewSet):
+	serializer_class = CheckInSerializer
+	permission_classes = [permissions.IsAuthenticated]
+	queryset = CheckIn.objects.all()
+
+	def get_queryset(self):
+		return CheckIn.objects.filter(owner=self.request.user)
+	
+	def perform_create(self,serializer):
+		serializer.save(owner = self.request.user)
+	
+	#def update(self, request, *args, **kwargs):
+		#kwargs['partial'] = True
+		#return super().update(request, *args, **kwargs)

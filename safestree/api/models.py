@@ -99,3 +99,8 @@ class AuditForm(models.Model):
 
 	def __str__(self):
 		return f'{self.location} - {self.score}'
+
+class CheckIn(models.Model):
+	author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='author', on_delete=models.CASCADE)
+	note = models.TextField(max_length=300)
+	created_at = models.DateField(auto_now_add=True)

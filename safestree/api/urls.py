@@ -5,6 +5,7 @@ from django.conf.urls import include,url
 
 router = DefaultRouter()
 router.register(r'guardians', views.GuardianDetails)
+router.register((r'checkins', views.CheckInAPI))
 
 urlpatterns = [
     url('', include(router.urls)),
@@ -14,7 +15,7 @@ urlpatterns = [
     path('news',views.news,name="news"),
     path('location',views.LocationAPI.as_view(),name="location"),
     path('audit-form',views.AuditFormAPI.as_view(),name="audit-form"),
-    path('alert',views.alert,name="alert"),
+    path('alert',views.sos_alert,name="sos_alert"),
     path('share-location',views.sharelocation,name="share-location"),
     path('fake-call',views.fakecall,name="fake-call")
 ]
