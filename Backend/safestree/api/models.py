@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.forms import BooleanField
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.base_user import BaseUserManager
@@ -60,6 +61,7 @@ class Guardian(models.Model):
 	name = models.CharField(max_length=100)
 	relation = models.CharField(max_length=100)
 	phone_no = PhoneNumberField(unique = True)
+	favourite = models.BooleanField(default = False)
 
 class Location(models.Model):
 	title = models.CharField(max_length=255,blank = True)

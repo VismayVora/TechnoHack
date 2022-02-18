@@ -1,15 +1,23 @@
 import datetime
 from django.contrib.auth import authenticate,login
-
+from django.conf import settings
 from .models import MyUser,Guardian, Location, AuditForm
+
 from .serializers import LocationSerializer, RegisterSerializer, LoginSerializer, GuardianSerializer, AuditFormSerializer
 from rest_framework import viewsets,permissions
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import GenericAPIView
 from rest_framework import status
 from rest_framework.response import Response
-
+from twilio.rest import Client
 import requests
+
+def send_text(number,msg):
+    client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN )
+    message = client.messages.create(body= f'{msg}',
+        to =str(number),
+        from_ ='+12346574691')
+    return('success')
 
 class RegisterAPI(GenericAPIView):
 	
@@ -61,6 +69,7 @@ class GuardianDetails(viewsets.ModelViewSet):
 		return super().update(request, *args, **kwargs)
 
 @api_view(('POST',))
+@permission_classes([permissions.IsAuthenticated])
 def news(self):
     url = ('https://newsapi.org/v2/everything?'
     'q=women+safety&'
@@ -110,3 +119,21 @@ class AuditFormAPI(GenericAPIView):
 			request.user.star()
 			request.user.save()
 		return Response(serializer.data)
+
+@api_view(('POST',))
+@permission_classes([permissions.IsAuthenticated])
+def alert(self):
+	guardians = Guardian.objects.filter(owner=self.user)
+	msg = 'Your ward has triggered Alert !'
+	for guardian in guardians:
+		k = send_text(guardian.phone_no,msg)
+	return Response({'success':'success'})
+
+@api_view(('POST',))
+@permission_classes([permissions.IsAuthenticated])
+def sharelocation(self):
+	guardians = Guardian.objects.filter(owner=self.user, favourite = True)
+	msg = 'location : '
+	for guardian in guardians:
+		k = send_text(guardian.phone_no,msg)
+	return Response({'success':'success'})

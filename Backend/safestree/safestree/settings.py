@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import environ
+
+env = environ.Env()
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,7 +45,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'rest_framework',
     'rest_framework.authtoken',
-
+    'django_twilio',
     'api',
 ]
 
@@ -77,10 +81,13 @@ WSGI_APPLICATION = 'safestree.wsgi.application'
 
 AUTH_USER_MODEL = 'api.MyUser'
 
+TWILIO_ACCOUNT_SID = env('TWILIO_SID')
+TWILIO_AUTH_TOKEN = env('TWILIO_AUTH_TOKEN')
+
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
+DATABASES = { 
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
