@@ -1,0 +1,1 @@
+web: gunicorn --pythonpath safestree safestree.wsgi --log-file -
