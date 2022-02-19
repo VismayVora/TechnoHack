@@ -91,7 +91,7 @@ def news(self):
     'sortBy=popularity&'
     'apiKey=c476157b8a084a4b8bdf8a1a8dd2a7a7')
     response = requests.get(url)
-    return Response(response)
+    return Response(response.json())
 
 class LocationAPI(GenericAPIView):
 	serializer_class = LocationSerializer
