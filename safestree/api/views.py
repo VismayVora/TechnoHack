@@ -1,6 +1,8 @@
 import datetime
 from django.contrib.auth import authenticate,login
 from django.conf import settings
+
+from api import FCMManager
 from .models import CheckIn, MyUser,Guardian, Location, AuditForm
 
 from .serializers import LocationSerializer, RegisterSerializer, LoginSerializer, GuardianSerializer, AuditFormSerializer, CheckInSerializer
@@ -115,15 +117,15 @@ class AuditFormAPI(GenericAPIView):
 
 	def post(self,request):
 		score = 0
-		score += request.data['lighting']
-		score += request.data['openness']
-		score += request.data['visibility']
-		score += request.data['people']
-		score += request.data['security']
-		score += request.data['walk_path']
-		score += request.data['public_transport']
-		score += request.data['public_usage']
-		score += request.data['feeling']
+		score += int(request.data['lighting'])
+		score += int(request.data['openness'])
+		score += int(request.data['visibility'])
+		score += int(request.data['people'])
+		score += int(request.data['security'])
+		score += int(request.data['walk_path'])
+		score += int(request.data['public_transport'])
+		score += int(request.data['public_usage'])
+		score += int(request.data['feeling'])
 		score /= 9
 		serializer = self.serializer_class(data=request.data)
 		if serializer.is_valid(raise_exception=True):
@@ -197,3 +199,9 @@ class CheckInAPI(viewsets.ModelViewSet):
 		#kwargs['partial'] = True
 		#return super().update(request, *args, **kwargs)
 
+@api_view(('POST',))
+def sendNotifications(request):
+	title = request.data['title']
+	desc = request.data['description']
+	FCMManager.sendPush(title,desc,None)
+	return Response({"title": "success", "description": "sucess"})

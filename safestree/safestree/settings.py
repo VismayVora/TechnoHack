@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'drf_yasg',
 
     'django_twilio',
+    'fcm_django',
     'api',
     'channels',
     'chat',
@@ -152,6 +153,8 @@ STATIC_URL = 'static/'
 #Media Handling
 MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+cred = os.path.join(BASE_DIR,"serviceAccountKey.json")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
