@@ -175,7 +175,7 @@ def nearby_search(request):
 		}
 		
 	response = requests.request("GET", url, headers=headers, data=payload)
-	print(response.text)
+	return Response(response.json())
 
 
 class CheckInAPI(viewsets.ModelViewSet):
