@@ -5,6 +5,7 @@ from django.conf.urls import include,url
 
 router = DefaultRouter()
 router.register(r'checkins', views.CheckInAPI)
+router.register(r'guardians', views.GuardianDetails)
 
 urlpatterns = [
     url('', include(router.urls)),
@@ -12,7 +13,6 @@ urlpatterns = [
     path('login/', views.LoginAPI.as_view(), name="login"),
     path('logout',views.logout,name="logout"),
     path('news',views.news,name="news"),
-    path('guardians',views.GuardianDetails,name="guardians"),
     path('nearbysearch',views.nearby_search,name="Nearby Search"),
     path('location',views.LocationAPI.as_view(),name="location"),
     path('audit-form',views.AuditFormAPI.as_view(),name="audit-form"),
