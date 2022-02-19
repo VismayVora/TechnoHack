@@ -139,7 +139,8 @@ def sharelocation(self):
 	location_link = self.data['link']
 	favourites = Guardian.objects.filter(owner=self.user, favourite = True)
 	for favourite in favourites:
-		msg = f"Hello {favourite.name}, {favourite.owner} has started location sharing with you. Click on this link to track the location: {location_link}"
+		#msg = f"Hello {favourite.name}, {favourite.owner} has started location sharing with you. Click on this link to track the location: {location_link}"
+		msg = f"Hello {favourite.name}, {favourite.owner} has started location sharing with you. Click on this link to track the location: location_link"
 		send_message(self,favourite,msg)
 		k = send_text(favourite.phone_no,msg)
 	return Response({'success':"The message has been sent to the favourite guardians!"})
@@ -150,7 +151,8 @@ def sos_alert(self):
 	location_link = self.data['link']
 	guardians = Guardian.objects.filter(owner=self.user)
 	for guardian in guardians:
-		msg = f"Hello {guardian.name}, {guardian.owner} is in trouble and has raised an SOS!!. Click on this link to track the location: {location_link}"
+		#msg = f"Hello {guardian.name}, {guardian.owner} is in trouble and has raised an SOS!!. Click on this link to track the location: {location_link}"
+		msg = f"Hello {guardian.name}, {guardian.owner} is in trouble and has raised an SOS!!. Click on this link to track the location: location_link"
 		send_message(self,guardian,msg)
 		k = send_text(guardian.phone_no,msg)
 	return Response({'success':"The message has been sent to guardians!"})
@@ -161,6 +163,18 @@ def fakecall(self):
 	user = self.user
 	call = call_me(user.phone_no)
 	return Response({'success':"Fake call has been generated!"})
+
+@api_view(('POST',))
+def nearby_search(keywords,latitude,longitude):
+	url = f"https://atlas.mapmyindia.com/api/places/nearby/json?keywords={keywords}&refLocation={latitude,longitude}"
+	payload={}
+	headers ={
+		'Authorization': 'bearer 7455992d-57e7-4a4a-8b54-7a433ea4dc1f'
+		}
+		
+	response = requests.request("GET", url, headers=headers, data=payload)
+	print(response.text)
+
 
 class CheckInAPI(viewsets.ModelViewSet):
 	serializer_class = CheckInSerializer
@@ -177,12 +191,3 @@ class CheckInAPI(viewsets.ModelViewSet):
 		#kwargs['partial'] = True
 		#return super().update(request, *args, **kwargs)
 
-@api_view(('POST',))
-def nearby_search(keywords,latitude,longitude):
-    url = f"https://atlas.mapmyindia.com/api/places/nearby/json?keywords={keywords}&refLocation={latitude,longitude}"
-    payload={}
-    headers = {
-        'Authorization': 'bearer 7455992d-57e7-4a4a-8b54-7a433ea4dc1f'
-  }
-  response = requests.request("GET", url, headers=headers, data=payload)
-  print(response.text)
