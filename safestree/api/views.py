@@ -5,6 +5,7 @@ from .models import CheckIn, MyUser,Guardian, Location, AuditForm
 
 from .serializers import LocationSerializer, RegisterSerializer, LoginSerializer, GuardianSerializer, AuditFormSerializer, CheckInSerializer
 from rest_framework import viewsets,permissions
+from rest_framework.views import APIView
 from rest_framework.decorators import action,api_view, permission_classes
 from rest_framework.generics import GenericAPIView
 from rest_framework import status
@@ -67,20 +68,23 @@ def logout(self, request):
     data = {'success': 'Sucessfully logged out'}
     return Response(data=data, status=status.HTTP_200_OK)
 
-class GuardianDetails(viewsets.ModelViewSet):
-	queryset = Guardian.objects.all()
-	serializer_class = GuardianSerializer
+class GuardianDetailsAPI(APIView):
 	permission_classes = [permissions.IsAuthenticated]
 
-	def get_queryset(self):
-		return Guardian.objects.filter(owner=self.request.user)
+	def get(self, request, phone_no):
+		guardian_objs = Guardian.objects.get(owner__phone_no= phone_no)
+		serializer = GuardianSerializer(guardian_objs, many = True)
+		return Response(serializer.data, status= status.HTTP_200_OK)
 	
-	def perform_create(self,serializer):
-		serializer.save(owner = self.request.user)
-	
-	def update(self, request, *args, **kwargs):
-		kwargs['partial'] = True
-		return super().update(request, *args, **kwargs)
+	def post(self, request, phone_no):
+		for i in range(len(request.data)):
+			request.data[i]['owner'].phone_no =  phone_no
+		serializer = GuardianSerializer(data= request.data, many=True)
+		if not serializer.is_valid():
+			return Response(serializer.errors, status= status.HTTP_403_FORBIDDEN)
+		serializer.save(owner__phone_no = phone_no)
+				
+		return Response(serializer.data, status= status.HTTP_201_CREATED)
 
 @api_view(('GET',))
 def news(self):
@@ -164,7 +168,10 @@ def fakecall(self):
 	return Response({'success':"Fake call has been generated!"})
 
 @api_view(('POST',))
-def nearby_search(keywords,latitude,longitude):
+def nearby_search(request):
+	keywords = request.data['keywords']
+	latitude = request.data['latitude']
+	longitude = request.data['longitude']
 	url = f"https://atlas.mapmyindia.com/api/places/nearby/json?keywords={keywords}&refLocation={latitude,longitude}"
 	payload={}
 	headers ={
