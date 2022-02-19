@@ -4,7 +4,6 @@ from rest_framework.routers import DefaultRouter
 from django.conf.urls import include,url
 
 router = DefaultRouter()
-router.register(r'guardians', views.GuardianDetails)
 router.register(r'checkins', views.CheckInAPI)
 
 urlpatterns = [
@@ -13,6 +12,7 @@ urlpatterns = [
     path('login/', views.LoginAPI.as_view(), name="login"),
     path('logout',views.logout,name="logout"),
     path('news',views.news,name="news"),
+    path('guardians',views.GuardianDetailsAPI,name="guardians"),
     path('nearbysearch',views.nearby_search,name="Nearby Search"),
     path('location',views.LocationAPI.as_view(),name="location"),
     path('audit-form',views.AuditFormAPI.as_view(),name="audit-form"),

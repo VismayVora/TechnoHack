@@ -7,6 +7,7 @@ from .models import CheckIn, MyUser,Guardian, Location, AuditForm
 
 from .serializers import LocationSerializer, RegisterSerializer, LoginSerializer, GuardianSerializer, AuditFormSerializer, CheckInSerializer
 from rest_framework import viewsets,permissions
+from rest_framework.views import APIView
 from rest_framework.decorators import action,api_view, permission_classes
 from rest_framework.generics import GenericAPIView
 from rest_framework import status
@@ -84,7 +85,7 @@ class GuardianDetails(viewsets.ModelViewSet):
 		kwargs['partial'] = True
 		return super().update(request, *args, **kwargs)
 
-@api_view(('POST',))
+@api_view(('GET',))
 def news(self):
     url = ('https://newsapi.org/v2/everything?'
     'q=women+safety&'
@@ -139,12 +140,12 @@ class AuditFormAPI(GenericAPIView):
 @permission_classes([permissions.IsAuthenticated])
 def sharelocation(self):
 	location_link = self.data['link']
-	favourites = Guardian.objects.filter(owner=self.user, favourite = True)
-	for favourite in favourites:
-		#msg = f"Hello {favourite.name}, {favourite.owner} has started location sharing with you. Click on this link to track the location: {location_link}"
-		msg = f"Hello {favourite.name}, {favourite.owner} has started location sharing with you. Click on this link to track the location: location_link"
-		send_message(self,favourite,msg)
-		k = send_text(favourite.phone_no,msg)
+	guardians = Guardian.objects.filter(owner=self.user)#, favourite = True)
+	for guardian in guardians:
+		msg = f"Hello {guardian.name}, {guardian.owner} has started location sharing with you. Click on this link to track the location: {location_link}"
+		send_message(self,guardian,msg)
+		k = send_text(guardian.phone_no,msg)
+	
 	return Response({'success':"The message has been sent to the favourite guardians!"})
 
 @api_view(('POST',))
@@ -153,13 +154,12 @@ def sos_alert(self):
 	location_link = self.data['link']
 	guardians = Guardian.objects.filter(owner=self.user)
 	for guardian in guardians:
-		#msg = f"Hello {guardian.name}, {guardian.owner} is in trouble and has raised an SOS!!. Click on this link to track the location: {location_link}"
-		msg = f"Hello {guardian.name}, {guardian.owner} is in trouble and has raised an SOS!!. Click on this link to track the location: location_link"
+		msg = f"Hello {guardian.name}, {guardian.owner} is in trouble and has raised an SOS!!. Click on this link to track the location: {location_link}"
 		send_message(self,guardian,msg)
 		k = send_text(guardian.phone_no,msg)
 	return Response({'success':"The message has been sent to guardians!"})
 
-@api_view(('POST',))
+@api_view(('GET',))
 @permission_classes([permissions.IsAuthenticated])
 def fakecall(self):
 	user = self.user
@@ -167,7 +167,10 @@ def fakecall(self):
 	return Response({'success':"Fake call has been generated!"})
 
 @api_view(('POST',))
-def nearby_search(keywords,latitude,longitude):
+def nearby_search(request):
+	keywords = request.data['keywords']
+	latitude = request.data['latitude']
+	longitude = request.data['longitude']
 	url = f"https://atlas.mapmyindia.com/api/places/nearby/json?keywords={keywords}&refLocation={latitude,longitude}"
 	payload={}
 	headers ={
@@ -183,8 +186,8 @@ class CheckInAPI(viewsets.ModelViewSet):
 	permission_classes = [permissions.IsAuthenticated]
 	queryset = CheckIn.objects.all()
 
-	def get_queryset(self):
-		return CheckIn.objects.filter(logger=self.request.user)
+	def get_queryset(self,phone_no):
+		return CheckIn.objects.filter(logger__phone_no=phone_no)
 	
 	def perform_create(self,serializer):
 		serializer.save(logger = self.request.user)
@@ -192,10 +195,3 @@ class CheckInAPI(viewsets.ModelViewSet):
 	#def update(self, request, *args, **kwargs):
 		#kwargs['partial'] = True
 		#return super().update(request, *args, **kwargs)
-
-@api_view(('POST',))
-def sendNotifications(request):
-	title = request.data['title']
-	desc = request.data['description']
-	FCMManager.sendPush(title,desc,None)
-	return Response({"title": "success", "description": "sucess"})

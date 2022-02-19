@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     'drf_yasg',
 
     'django_twilio',
-    'fcm_django',
     'api',
 ]
 
@@ -86,6 +85,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'safestree.wsgi.application'
+
+ASGI_APPLICATION = 'safestree.asgi.application'
 
 AUTH_USER_MODEL = 'api.MyUser'
 
@@ -133,7 +134,7 @@ REST_FRAMEWORK = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -149,8 +150,6 @@ STATIC_URL = 'static/'
 #Media Handling
 MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
-
-cred = os.path.join(BASE_DIR,"serviceAccountKey.json")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
