@@ -176,3 +176,13 @@ class CheckInAPI(viewsets.ModelViewSet):
 	#def update(self, request, *args, **kwargs):
 		#kwargs['partial'] = True
 		#return super().update(request, *args, **kwargs)
+
+@api_view(('POST',))
+def nearby_search(keywords,latitude,longitude):
+    url = f"https://atlas.mapmyindia.com/api/places/nearby/json?keywords={keywords}&refLocation={latitude,longitude}"
+    payload={}
+    headers = {
+        'Authorization': 'bearer 7455992d-57e7-4a4a-8b54-7a433ea4dc1f'
+  }
+  response = requests.request("GET", url, headers=headers, data=payload)
+  print(response.text)
