@@ -7,7 +7,7 @@ def send_message(request, user, message):
     url = "https://api.wassenger.com/v1/messages"
 
     payload = {
-        "phone": str(user.number),
+        "phone": str(user.phone_no),
         "message": message
     }
     headers = {
