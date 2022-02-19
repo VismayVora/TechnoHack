@@ -137,12 +137,12 @@ class AuditFormAPI(GenericAPIView):
 @permission_classes([permissions.IsAuthenticated])
 def sharelocation(self):
 	location_link = self.data['link']
-	favourites = Guardian.objects.filter(owner=self.user, favourite = True)
-	for favourite in favourites:
-		#msg = f"Hello {favourite.name}, {favourite.owner} has started location sharing with you. Click on this link to track the location: {location_link}"
-		msg = f"Hello {favourite.name}, {favourite.owner} has started location sharing with you. Click on this link to track the location: location_link"
-		send_message(self,favourite,msg)
-		k = send_text(favourite.phone_no,msg)
+	guardians = Guardian.objects.filter(owner=self.user)#, favourite = True)
+	for guardian in guardians:
+		msg = f"Hello {guardian.name}, {guardian.owner} has started location sharing with you. Click on this link to track the location: {location_link}"
+		send_message(self,guardian,msg)
+		k = send_text(guardian.phone_no,msg)
+	
 	return Response({'success':"The message has been sent to the favourite guardians!"})
 
 @api_view(('POST',))
@@ -151,8 +151,7 @@ def sos_alert(self):
 	location_link = self.data['link']
 	guardians = Guardian.objects.filter(owner=self.user)
 	for guardian in guardians:
-		#msg = f"Hello {guardian.name}, {guardian.owner} is in trouble and has raised an SOS!!. Click on this link to track the location: {location_link}"
-		msg = f"Hello {guardian.name}, {guardian.owner} is in trouble and has raised an SOS!!. Click on this link to track the location: location_link"
+		msg = f"Hello {guardian.name}, {guardian.owner} is in trouble and has raised an SOS!!. Click on this link to track the location: {location_link}"
 		send_message(self,guardian,msg)
 		k = send_text(guardian.phone_no,msg)
 	return Response({'success':"The message has been sent to guardians!"})
@@ -181,8 +180,8 @@ class CheckInAPI(viewsets.ModelViewSet):
 	permission_classes = [permissions.IsAuthenticated]
 	queryset = CheckIn.objects.all()
 
-	def get_queryset(self):
-		return CheckIn.objects.filter(logger=self.request.user)
+	def get_queryset(self,phone_no):
+		return CheckIn.objects.filter(logger__phone_no=phone_no)
 	
 	def perform_create(self,serializer):
 		serializer.save(logger = self.request.user)
