@@ -157,7 +157,7 @@ def sos_alert(self):
 		k = send_text(guardian.phone_no,msg)
 	return Response({'success':"The message has been sent to guardians!"})
 
-@api_view(('POST',))
+@api_view(('GET',))
 @permission_classes([permissions.IsAuthenticated])
 def fakecall(self):
 	user = self.user
