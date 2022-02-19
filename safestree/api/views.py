@@ -168,10 +168,10 @@ class CheckInAPI(viewsets.ModelViewSet):
 	queryset = CheckIn.objects.all()
 
 	def get_queryset(self):
-		return CheckIn.objects.filter(owner=self.request.user)
+		return CheckIn.objects.filter(logger=self.request.user)
 	
 	def perform_create(self,serializer):
-		serializer.save(owner = self.request.user)
+		serializer.save(logger = self.request.user)
 	
 	#def update(self, request, *args, **kwargs):
 		#kwargs['partial'] = True
