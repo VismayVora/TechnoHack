@@ -18,5 +18,6 @@ urlpatterns = [
     path('audit-form',views.AuditFormAPI.as_view(),name="audit-form"),
     path('alert',views.sos_alert,name="sos_alert"),
     path('share-location',views.sharelocation,name="share-location"),
-    path('fake-call',views.fakecall,name="fake-call")
+    path('fake-call',views.fakecall,name="fake-call"),
+    path('send-notification',views.sendNotifications,name="send-notification")
 ]
