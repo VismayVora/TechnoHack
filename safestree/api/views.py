@@ -2,12 +2,11 @@ import datetime
 from django.contrib.auth import authenticate,login
 from django.conf import settings
 
-from api import FCMManager
+
 from .models import CheckIn, MyUser,Guardian, Location, AuditForm
 
 from .serializers import LocationSerializer, RegisterSerializer, LoginSerializer, GuardianSerializer, AuditFormSerializer, CheckInSerializer
 from rest_framework import viewsets,permissions
-from rest_framework.views import APIView
 from rest_framework.decorators import action,api_view, permission_classes
 from rest_framework.generics import GenericAPIView
 from rest_framework import status
@@ -15,8 +14,6 @@ from rest_framework.response import Response
 
 from .whatsapp import send_message
 from django.http import JsonResponse
-from rest_framework.generics import GenericAPIView
-from rest_framework import status
 from twilio.rest import Client
 import requests
 
