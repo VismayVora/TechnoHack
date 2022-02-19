@@ -82,7 +82,7 @@ class GuardianDetails(viewsets.ModelViewSet):
 		kwargs['partial'] = True
 		return super().update(request, *args, **kwargs)
 
-@api_view(('POST',))
+@api_view(('GET',))
 def news(self):
     url = ('https://newsapi.org/v2/everything?'
     'q=women+safety&'
