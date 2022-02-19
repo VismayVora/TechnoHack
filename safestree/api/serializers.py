@@ -52,7 +52,7 @@ class AuditFormSerializer(serializers.ModelSerializer):
 		fields = '__all__'
     
 class CheckInSerializer(serializers.ModelSerializer):
-	author = serializers.ReadOnlyField(source='author.name')
+	logger = serializers.ReadOnlyField(source='logger.name')
 
 	class Meta:
 		model = CheckIn
