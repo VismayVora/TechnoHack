@@ -12,12 +12,11 @@ urlpatterns = [
     path('login/', views.LoginAPI.as_view(), name="login"),
     path('logout',views.logout,name="logout"),
     path('news',views.news,name="news"),
-    path('guardians',views.GuardianDetailsAPI,name="guardians"),
+    path('guardians',views.GuardianDetails,name="guardians"),
     path('nearbysearch',views.nearby_search,name="Nearby Search"),
     path('location',views.LocationAPI.as_view(),name="location"),
     path('audit-form',views.AuditFormAPI.as_view(),name="audit-form"),
     path('alert',views.sos_alert,name="sos_alert"),
     path('share-location',views.sharelocation,name="share-location"),
     path('fake-call',views.fakecall,name="fake-call"),
-    path('send-notification',views.sendNotifications,name="send-notification")
 ]
