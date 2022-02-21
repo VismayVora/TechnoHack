@@ -1,4 +1,4 @@
-import datetime
+import datetime,json
 from django.contrib.auth import authenticate,login
 from django.conf import settings
 
@@ -10,7 +10,7 @@ from rest_framework import viewsets,permissions
 from rest_framework.decorators import action,api_view, permission_classes
 from rest_framework.generics import GenericAPIView
 from rest_framework import status
-from rest_framework.response import Response
+from rest_framework.response import Response 
 
 from .whatsapp import send_message
 from django.http import JsonResponse
@@ -163,17 +163,29 @@ def fakecall(self):
 	call = call_me(user.phone_no)
 	return Response({'success':"Fake call has been generated!"})
 
+def mapmyindia_token():
+	#Retrieving token
+	url = "https://outpost.mapmyindia.com/api/security/oauth/token"
+	payload='grant_type=client_credentials&client_id=33OkryzDZsJeY7NmLDf79EdHohcvof1fARN7VL4xLwBl9sUpkxXvLEEleykR3i3E_y5gSeOiq-iIEIWkJ0FgKQ%3D%3D&client_secret=lrFxI-iSEg98iV1v-omJB3PmZgXX5UShNtRH_bPW3DHLZGKF9nrcoJZcFgk1Rj2jtxC_AhLTwQLuOGcQ1J-iTbTDTrQNYXh0'
+	headers = {
+		'Content-Type': 'application/x-www-form-urlencoded'
+		}
+	
+	response = requests.request("POST", url, headers=headers, data=payload)
+	return json.loads(response.text)
+		
 @api_view(('POST',))
 def nearby_search(request):
+	access_token = mapmyindia_token()['access_token']
+	print(type(access_token))
 	keywords = request.data['keywords']
 	latitude = request.data['latitude']
 	longitude = request.data['longitude']
-	url = f"https://atlas.mapmyindia.com/api/places/nearby/json?keywords={keywords}&refLocation={latitude,longitude}"
+	url = f"https://atlas.mapmyindia.com/api/places/nearby/json?keywords={keywords} &refLocation={latitude}, {longitude}"
 	payload={}
 	headers ={
-		'Authorization': 'bearer 7455992d-57e7-4a4a-8b54-7a433ea4dc1f'
+		'Authorization': 'bearer ' + access_token
 		}
-		
 	response = requests.request("GET", url, headers=headers, data=payload)
 	return Response(response.json())
 
